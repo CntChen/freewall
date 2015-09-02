@@ -1,6 +1,9 @@
 // created by Minh Nguyen;
 // version 1.05;
 
+// Editied by CntChen
+// 2015.09.02
+
 (function($) {
     
     // for zeptojs;
@@ -14,6 +17,10 @@
 
     var $W = $(window);
     var $D = $(document);
+
+    // Edited by CntChen
+    // For unbind item old handle event and bind event for new handle
+    var draggableItemHandle = {};
     
     var layoutManager = {
         // default setting;
@@ -433,6 +440,8 @@
                 
 
                 function mouseDown(evt) {
+                    // Edited by CntChen
+                    // disable stopPropagation event for UiHelper.popupMgr
                     evt.stopPropagation();
                     evt = evt.originalEvent;
 
@@ -453,6 +462,10 @@
                         $D.bind("mousemove touchmove", mouseMove); 
                     }
 
+                    // Edited by CntChen
+                    // disable stopPropagation event for UiHelper.popupMgr
+                    // ref: http://api.jquery.com/bind/
+                    // "Returning false from a handler is equivalent to calling both .preventDefault() and .stopPropagation() on the event object."
                     return false;
                 };
                 
@@ -487,10 +500,20 @@
                     });
                 });
                 
+                /*
+                * Edited by CntChen
+                * For unbind item old handle event and bind event for new handle
+                * Use id to identify item
+                */
+                var itemId = $(item).attr('id');
+                if (itemId) {
+                    draggableItemHandle[itemId] && draggableItemHandle[itemId].unbind("mousedown touchstart");
+                    draggableItemHandle[itemId] = $H;
+                }
+
                 $D.unbind("mouseup touchend", mouseUp);
                 $D.unbind("mousemove touchmove", mouseMove);
                 $H.unbind("mousedown touchstart").bind("mousedown touchstart", mouseDown);
-
             });
         },
         setTransition: function(item, trans) {
@@ -543,7 +566,6 @@
                 width: minX - l,
                 height: minY - t
             };
-
         },
         setWallSize: function(runtime, container) {
             var totalRow = runtime.totalRow;
@@ -806,7 +828,6 @@
         
 
         function setDraggable(item) {
-            
             var gutterX = runtime.gutterX;
             var gutterY = runtime.gutterY;
             var cellH = runtime.cellH;
@@ -1078,7 +1099,6 @@
             /*
             set block with special position, the top and left are multiple of unit width/height;
             example:
-
                 wall.fixPos({
                     top: 0,
                     left: 0,
@@ -1086,7 +1106,15 @@
                 });
             */
             fixPos: function(option) {
-                $(option.block).attr({'data-position': option.top + "-" + option.left});
+                /*
+                Edited by CntChen 
+                remove data-position for disable the prority of drag
+                */
+                if(option.top === undefined || option.left === undefined){
+                    $(option.block).removeAttr('data-position');
+                }else{
+                    $(option.block).attr({'data-position': option.top + "-" + option.left});
+                }
                 return this;
             },
 

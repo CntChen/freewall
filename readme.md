@@ -45,3 +45,13 @@ Freewall supports almost browser
 
 ## License
 Released under the MIT license
+
+
+## 对freeWall源码做了修改 ##
+* 拓展`freeWall.fixPos()`方法，不带`top`或`left`参数时候，删除brick的位置属性`data-position`
+```
+   freeWall.fixPos({
+     block: element
+   });
+```
+* `setDraggable`,移除旧的`handle`绑定，然后设置新的`handle`绑定。
